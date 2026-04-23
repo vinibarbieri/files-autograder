@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: autograder-backend
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 2MB
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+autograder:
+  # Root directory where assignments + answer keys are cached locally
+  # after being pulled from the private git source-of-truth repo.
+  assignments:
+    cache-dir: ./assignments
+    source-repo-url: ${AUTOGRADER_ASSIGNMENTS_REPO:}
+    refresh-on-startup: true
+
+  # Defaults applied to every ephemeral container unless the assignment
+  # manifest overrides them.
+  execution:
+    image: gcc:14-bookworm
+    default-timeout-seconds: 10
+    memory-limit-mb: 256
+    cpu-quota-percent: 50
+    network-disabled: true
+
+  # Milestone-1 stays single-threaded; the queue lands in milestone 2.
+  submission:
+    max-source-size-bytes: 262144   # 256 KiB
+    allowed-extensions:
+      - .c
+
+logging:
+  level:
+    root: INFO
+    com.autograder: DEBUG
