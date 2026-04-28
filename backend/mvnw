@@ -1,0 +1,79 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Apache Maven Wrapper startup script, version 3.3.2
+# ----------------------------------------------------------------------------
+
+set -euf
+[ "${MVNW_VERBOSE-}" != debug ] || set -x
+
+MVNW_REPOURL="${MVNW_REPOURL-}"
+MVNW_USERNAME="${MVNW_USERNAME-}"
+MVNW_PASSWORD="${MVNW_PASSWORD-}"
+MVNW_VERBOSE="${MVNW_VERBOSE-}"
+
+case "$(uname)" in
+CYGWIN* | MINGW* | MSYS*) ;;
+*)
+  [ -z "${JAVA_HOME-}" ] || JAVA_HOME=$(cd "$JAVA_HOME" && pwd -P)
+  ;;
+esac
+
+if [ -z "${JAVA_HOME-}" ]; then
+  JAVACMD="$(command -v java)"
+else
+  JAVACMD="$JAVA_HOME/bin/java"
+fi
+
+if [ ! -x "${JAVACMD}" ]; then
+  echo "Error: JAVA_HOME is not defined correctly." >&2
+  echo "  Cannot execute ${JAVACMD}" >&2
+  exit 1
+fi
+
+BASE_DIR="$(cd "$(dirname "$0")"; pwd -P)"
+WRAPPER_DIR="$BASE_DIR/.mvn/wrapper"
+WRAPPER_JAR="$WRAPPER_DIR/maven-wrapper.jar"
+PROPS_FILE="$WRAPPER_DIR/maven-wrapper.properties"
+
+if [ ! -f "$PROPS_FILE" ]; then
+  echo "Error: missing $PROPS_FILE" >&2
+  exit 1
+fi
+
+if [ ! -r "$PROPS_FILE" ]; then
+  echo "Error: cannot read $PROPS_FILE" >&2
+  exit 1
+fi
+
+distributionUrl="$(sed -n 's/^distributionUrl=//p' "$PROPS_FILE" | tail -1)"
+wrapperUrl="$(sed -n 's/^wrapperUrl=//p' "$PROPS_FILE" | tail -1)"
+
+if [ -z "$wrapperUrl" ]; then
+  if [ -n "$MVNW_REPOURL" ]; then
+    wrapperUrl="$MVNW_REPOURL/org/apache/maven/wrapper/maven-wrapper/3.3.2/maven-wrapper-3.3.2.jar"
+  else
+    wrapperUrl="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.2/maven-wrapper-3.3.2.jar"
+  fi
+fi
+
+if [ ! -f "$WRAPPER_JAR" ]; then
+  mkdir -p "$WRAPPER_DIR"
+  echo "Downloading Maven wrapper from $wrapperUrl"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL ${MVNW_USERNAME:+--user "$MVNW_USERNAME:$MVNW_PASSWORD"} "$wrapperUrl" -o "$WRAPPER_JAR"
+  elif command -v wget >/dev/null 2>&1; then
+    wget ${MVNW_USERNAME:+--user "$MVNW_USERNAME"} ${MVNW_PASSWORD:+--password "$MVNW_PASSWORD"} -O "$WRAPPER_JAR" "$wrapperUrl"
+  else
+    echo "Error: neither curl nor wget is available to download maven-wrapper.jar" >&2
+    exit 1
+  fi
+fi
+
+MAVEN_OPTS="${MAVEN_OPTS-} -Dmaven.multiModuleProjectDirectory=${BASE_DIR}"
+
+exec "$JAVACMD" \
+  $MAVEN_OPTS \
+  -classpath "$WRAPPER_JAR" \
+  -Dmaven.wrapper.properties="$PROPS_FILE" \
+  -Dmaven.multiModuleProjectDirectory="$BASE_DIR" \
+  org.apache.maven.wrapper.MavenWrapperMain "$@"
