@@ -143,17 +143,12 @@ Target: full `./mvnw test` under 30 seconds. If you push it past that, flag it i
 - **Conventional commit messages**:
   ```
   <type>(<scope>): <imperative summary>
-
-  Body: why, not what. Link the ADR / roadmap cycle if relevant.
   ```
+  Max length: one line only (no body/footer). Keep it short and direct.
   Types: `feat`, `test`, `refactor`, `fix`, `chore`, `docs`, `ci`.
   Example:
   ```
   test(domain): red test for SubmissionValidator oversize rejection
-
-  Drives roadmap cycle 1 (SubmissionValidator). Assertion checks the
-  InvalidSubmissionException.Reason enum, not the message string, so the
-  message can evolve without breaking the test.
   ```
 - Every PR against `main` must pass the CI workflow defined in `[.github/workflows/ci.yml](./.github/workflows/ci.yml)`.
 
