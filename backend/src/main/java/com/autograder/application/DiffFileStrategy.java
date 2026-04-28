@@ -4,6 +4,7 @@ import com.autograder.domain.Assignment;
 import com.autograder.domain.EvaluationResult;
 import com.autograder.domain.EvaluationStrategy;
 import com.autograder.domain.ExecutionResult;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -25,6 +26,7 @@ import java.util.TreeMap;
  * is {@link com.autograder.domain.Verdict#FAIL} with a diff that names the
  * file(s) involved.
  */
+@Component("diff-file")
 public class DiffFileStrategy implements EvaluationStrategy {
 
     @Override

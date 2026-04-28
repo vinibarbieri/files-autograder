@@ -4,6 +4,7 @@ import com.autograder.domain.Assignment;
 import com.autograder.domain.EvaluationResult;
 import com.autograder.domain.EvaluationStrategy;
 import com.autograder.domain.ExecutionResult;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link EvaluationStrategy} that compares the container's stdout against
@@ -19,6 +20,7 @@ import com.autograder.domain.ExecutionResult;
  * <p>If the execution timed out the result is {@link com.autograder.domain.Verdict#TIMEOUT}
  * regardless of any partial stdout captured.
  */
+@Component("diff-stdout")
 public class DiffStdoutStrategy implements EvaluationStrategy {
 
     @Override
