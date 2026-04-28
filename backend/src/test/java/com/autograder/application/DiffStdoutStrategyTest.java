@@ -147,6 +147,7 @@ class DiffStdoutStrategyTest {
                 Duration.ofSeconds(10),
                 List.of(),
                 expectedStdout,
+                Map.of(),
                 "diff-stdout");
     }
 }
