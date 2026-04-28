@@ -1,5 +1,7 @@
 package com.autograder.domain;
 
+import java.util.regex.Pattern;
+
 /**
  * First TDD target (see {@code docs/TDD_ROADMAP.md}, step 1).
  *
@@ -7,11 +9,12 @@ package com.autograder.domain;
  * {@link SubmissionPolicy} before any I/O is done. Pure function — no
  * dependencies beyond the JDK, no collaborators to mock.
  *
- * <p><b>Intentionally unimplemented.</b> The red test in
- * {@code SubmissionValidatorTest} drives the first implementation. Do not
- * implement this class without first extending that test.
+ * <p>Roadmap cycle 1 — implemented green. Tests live in {@code SubmissionValidatorTest}.
  */
 public class SubmissionValidator {
+
+    private static final Pattern PROBLEM_FILE_NAME_PATTERN =
+            Pattern.compile("^problem\\d+\\.c$");
 
     private final SubmissionPolicy policy;
 
@@ -25,9 +28,33 @@ public class SubmissionValidator {
      * @throws InvalidSubmissionException when the submission violates policy
      */
     public void validate(Submission submission) {
-        throw new UnsupportedOperationException(
-                "SubmissionValidator.validate is the first TDD red target; "
-                        + "implement it only when driven by a failing test.");
+        if (submission.source().length == 0) {
+            throw new InvalidSubmissionException(
+                    InvalidSubmissionException.Reason.EMPTY_SOURCE,
+                    "Source file is empty.");
+        }
+
+        if (submission.sizeBytes() > policy.maxSourceSizeBytes()) {
+            throw new InvalidSubmissionException(
+                    InvalidSubmissionException.Reason.SOURCE_TOO_LARGE,
+                    "Source size " + submission.sizeBytes()
+                            + " bytes exceeds limit of " + policy.maxSourceSizeBytes() + " bytes.");
+        }
+
+        boolean extensionAllowed = policy.allowedExtensions().stream()
+                .anyMatch(ext -> submission.fileName().endsWith(ext));
+        boolean matchesProblemFileName = PROBLEM_FILE_NAME_PATTERN.matcher(submission.fileName()).matches();
+        if (!extensionAllowed || !matchesProblemFileName) {
+            throw new InvalidSubmissionException(
+                    InvalidSubmissionException.Reason.DISALLOWED_EXTENSION,
+                    "File name must match problemX.c where X is numeric: " + submission.fileName());
+        }
+
+        if (!submission.assignmentId().matches(policy.assignmentIdPattern())) {
+            throw new InvalidSubmissionException(
+                    InvalidSubmissionException.Reason.INVALID_ASSIGNMENT_ID,
+                    "Assignment ID does not match required pattern: " + submission.assignmentId());
+        }
     }
 
     /**

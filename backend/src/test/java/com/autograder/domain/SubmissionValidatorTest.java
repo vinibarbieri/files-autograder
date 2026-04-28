@@ -27,7 +27,7 @@ class SubmissionValidatorTest {
     @Test
     @DisplayName("accepts a well-formed submission")
     void accepts_wellFormedSubmission() {
-        Submission submission = submission("hw03", "main.c", "int main(){return 0;}");
+        Submission submission = submission("hw03", "problem3.c", "int main(){return 0;}");
 
         assertThatCode(() -> validator.validate(submission))
                 .doesNotThrowAnyException();
@@ -58,9 +58,20 @@ class SubmissionValidatorTest {
     }
 
     @Test
-    @DisplayName("rejects disallowed file extension")
-    void rejects_disallowedExtension() {
-        Submission submission = submission("hw03", "main.cpp", "int main(){return 0;}");
+    @DisplayName("rejects filename that does not match problemX.c")
+    void rejects_invalidFileNamePattern() {
+        Submission submission = submission("hw03", "main.c", "int main(){return 0;}");
+
+        assertThatThrownBy(() -> validator.validate(submission))
+                .isInstanceOf(InvalidSubmissionException.class)
+                .extracting(e -> ((InvalidSubmissionException) e).reason())
+                .isEqualTo(InvalidSubmissionException.Reason.DISALLOWED_EXTENSION);
+    }
+
+    @Test
+    @DisplayName("rejects non-numeric problem suffix")
+    void rejects_nonNumericProblemSuffix() {
+        Submission submission = submission("hw03", "problemX.c", "int main(){return 0;}");
 
         assertThatThrownBy(() -> validator.validate(submission))
                 .isInstanceOf(InvalidSubmissionException.class)
@@ -71,7 +82,7 @@ class SubmissionValidatorTest {
     @Test
     @DisplayName("rejects assignment id that does not match the policy pattern")
     void rejects_invalidAssignmentId() {
-        Submission submission = submission("hw 03!", "main.c", "int main(){return 0;}");
+        Submission submission = submission("hw 03!", "problem3.c", "int main(){return 0;}");
 
         assertThatThrownBy(() -> validator.validate(submission))
                 .isInstanceOf(InvalidSubmissionException.class)
